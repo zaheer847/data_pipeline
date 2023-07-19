@@ -1,3 +1,6 @@
+"""
+Importing necessary packages and modules.
+"""
 import logging
 import requests
 import pandas as pd
@@ -5,13 +8,12 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+
 def fetch_weather_data(merged_data: pd.DataFrame) -> pd.DataFrame:
     """
     Fetches weather data based on the latitude and longitude of user addresses.
-
     Args:
         merged_data (pd.DataFrame): The merged data containing sales and user information.
-
     Returns:
         pd.DataFrame: The merged data with added weather information.
     """
@@ -21,15 +23,15 @@ def fetch_weather_data(merged_data: pd.DataFrame) -> pd.DataFrame:
         lon = row['address']['geo']['lng']
         url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}"
         try:
-            response = requests.get(url)
+            response = requests.get(url, timeout=10)
             response.raise_for_status()
             weather_data = response.json()
             temperature = weather_data['main']['temp']
             description = weather_data['weather'][0]
             merged_data.at[index, 'temperature'] = temperature
-            logger.debug(f"Added weather info to index {index}: {temperature} {description}")
-        except requests.exceptions.RequestException as e:
-            logger.warning(f"An error occurred while fetching weather data: {e}")
+            logger.debug("Added weather info to index %s: %s %s", index, temperature, description)
+        except requests.exceptions.RequestException as req_exc:
+            logger.warning("An error occurred while fetching weather data: %s", req_exc)
             merged_data.at[index, 'temperature'] = None
             merged_data.at[index, 'weather_description'] = 'Weather data unavailable'
     return merged_data

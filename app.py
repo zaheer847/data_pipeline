@@ -1,10 +1,12 @@
-# # Importing necessary packages and modules for data processing, storage, and visualization.
+"""
+Importing necessary packages and modules for data processing, storage, and visualization.
+"""
+import logging
 from flask import Flask, url_for
 from weather import fetch_weather_data
 from visualizations import create_visualizations
 from data_processing import merge_data_with_users, perform_data_aggregations
 from db_operations import store_data_in_database, create_database_schema
-import logging
 
 app = Flask(__name__)
 
@@ -17,6 +19,7 @@ ch.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 ch.setFormatter(formatter)
 app.logger.addHandler(ch)
+
 
 @app.route('/transform')
 def transform_data():
@@ -48,7 +51,16 @@ def transform_data():
         imgs = create_visualizations(aggregated_data)
 
         # Prepare the HTML content with links to the generated visualizations
-        html_content = "<html><head><title>Building Comprehensive Sales Data Pipeline</title></head><body><h1>Building Comprehensive Sales Data Pipeline</h1><p>Data transformation completed.</p><ul>"
+        html_content = """
+        <html>
+        <head>
+        <title>Building Comprehensive Sales Data Pipeline</title>
+        </head>
+        <body>
+        <h1>Building Comprehensive Sales Data Pipeline</h1>
+        <p>Data transformation completed.</p>
+        <ul>
+        """
 
         for img in imgs:
             url = url_for('static', filename=img)
@@ -58,9 +70,10 @@ def transform_data():
 
         return html_content
 
-    except Exception as e:
-        logger.exception(f"An error occurred during data transformation: {e}")
+    except Exception as exc:
+        logger.exception("An error occurred during data transformation: %s", exc)
         return "An error occurred during data transformation.", 500
+
 
 if __name__ == '__main__':
     # Create the database schema

@@ -1,12 +1,17 @@
-from typing import Optional, Dict
+"""
+Importing necessary packages and modules.
+"""
 import logging
+from typing import Optional, Dict
 import requests
 import pandas as pd
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-def fetch_user_data(api_url: str = 'https://jsonplaceholder.typicode.com/users') -> Optional[pd.DataFrame]:
+
+def fetch_user_data(api_url: str = 'https://jsonplaceholder.typicode.com/users') \
+        -> Optional[pd.DataFrame]:
     """
     Fetches user data from an API and returns it as a pandas DataFrame.
 
@@ -21,12 +26,14 @@ def fetch_user_data(api_url: str = 'https://jsonplaceholder.typicode.com/users')
         response.raise_for_status()
         user_data = response.json()
         user_data = pd.DataFrame(user_data)
-        user_data = user_data[['id', 'name', 'username', 'email', 'address']].rename(columns={'id': 'customer_id'})
-        logger.debug(f"Fetched user data: {user_data}")
+        user_data = user_data[['id', 'name', 'username', 'email', 'address']]\
+            .rename(columns={'id': 'customer_id'})
+        logger.debug("Fetched user data: %s", user_data)
         return user_data
-    except requests.exceptions.RequestException as e:
-        logger.exception(f"An error occurred while fetching user data: {e}")
+    except requests.exceptions.RequestException as req_exc:
+        logger.exception("An error occurred while fetching user data: %s", req_exc)
         return None
+
 
 def merge_data_with_users() -> pd.DataFrame:
     """
@@ -44,6 +51,7 @@ def merge_data_with_users() -> pd.DataFrame:
         raise ValueError("Unable to fetch user data.")
     merged_data = pd.merge(sales_data, user_data, on='customer_id')
     return merged_data
+
 
 def perform_data_aggregations(merged_data: pd.DataFrame) -> Dict[str, pd.Series]:
     """
@@ -88,5 +96,5 @@ def perform_data_aggregations(merged_data: pd.DataFrame) -> Dict[str, pd.Series]
 
         return aggregated_data
 
-    except Exception as e:
-        raise ValueError(f"Error during data aggregation: {e}")
+    except Exception as exc:
+        raise ValueError("Error during data aggregation: %s" % exc)
